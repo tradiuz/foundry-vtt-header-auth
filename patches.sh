@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-HEADER_USERNAME="${HEADER_USERNAME:-"x-auth-request-preferred-username"}"
-HEADER_ROLES="${HEADER_ROLES:-"x-auth-request-groups"}"
-HEADER_ROLES_SEPARATOR="${HEADER_ROLES_SEPARATOR:-","}"
-ROLE_PLAYER="${ROLE_PLAYER:-"role:foundry-vtt:player"}"
-ROLE_ADMIN="${ROLE_ADMIN:-"role:foundry-vtt:admin"}"
+HEADER_USERNAME="${HEADER_USERNAME:-"x-authentik-username"}"
+HEADER_ROLES="${HEADER_ROLES:-"x-authentik-groups"}"
+HEADER_ROLES_SEPARATOR="${HEADER_ROLES_SEPARATOR:-"|"}"
+ROLE_PLAYER="${ROLE_PLAYER:-"foundry-player"}"
+ROLE_ADMIN="${ROLE_ADMIN:-"foundry-admin"}"
 
 # usage: $0 patch-name file [sed-expression]
 # Utility to use sed to patch a file, verifying that it actually changed something.
