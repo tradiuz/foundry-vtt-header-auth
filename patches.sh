@@ -5,6 +5,13 @@ HEADER_ROLES="${HEADER_ROLES:-"x-authentik-groups"}"
 HEADER_ROLES_SEPARATOR="${HEADER_ROLES_SEPARATOR:-"|"}"
 ROLE_PLAYER="${ROLE_PLAYER:-"foundry-player"}"
 ROLE_ADMIN="${ROLE_ADMIN:-"foundry-admin"}"
+MAJOR_VERSION=$( echo ${FOUNDRY_VERSION} | cut -d'.' -f1)
+
+if [[ $MAJOR_VERSION > 12 ]]; then
+	$FOUNDRY_FILE='resources/app/public/scripts/foundry.mjs'
+else
+	$FOUNDRY_FILE='resources/app/public/scripts/foundry.js'
+fi
 
 # usage: $0 patch-name file [sed-expression]
 # Utility to use sed to patch a file, verifying that it actually changed something.
@@ -62,8 +69,8 @@ END
 # Pass information about the user info from the headers to the client side. This is used for auto-login behavior, as well as to hide elements that aren't relevant for players.
 patch_sed track-header-info resources/app/dist/sessions.mjs "s/global\.logger\.info(\`Created client session \${\(\w\+\)\.id}\`)/(t.headerInfo = { username: s.headers['$HEADER_USERNAME'], isAdmin: s.headers['$HEADER_ROLES']?.split('$HEADER_ROLES_SEPARATOR')?.includes('$ROLE_ADMIN') ?? false }), &/"
 patch_sed track-header-info resources/app/dist/server/sockets.mjs 's/\(\w\+\)\.sessionId=\(\w\+\)\.id/&,\1.headerInfo = \2.headerInfo/'
-patch_sed track-header-info resources/app/public/scripts/foundry.mjs 's/id = response\.sessionId;/& localStorage.headerInfo = JSON.stringify(response.headerInfo);/'
-patch_append track-header-info resources/app/public/scripts/foundry.mjs << END
+patch_sed track-header-info $FOUNDRY_FILE 's/id = response\.sessionId;/& localStorage.headerInfo = JSON.stringify(response.headerInfo);/'
+patch_append track-header-info $FOUNDRY_FILE << END
 	window.withHeaderInfo = (cb) => {
 		if (localStorage.headerInfo) {
 			const headerInfo = JSON.parse(localStorage.headerInfo);
@@ -73,7 +80,7 @@ patch_append track-header-info resources/app/public/scripts/foundry.mjs << END
 		}
 	};
 END
-patch_append add-non-admin-class resources/app/public/scripts/foundry.mjs << END
+patch_append add-non-admin-class $FOUNDRY_FILE << END
 	window.withHeaderInfo((headerInfo) => {
 		if (!headerInfo.isAdmin) {
 			document.body.classList.add('header-info-non-admin');
@@ -83,7 +90,7 @@ END
 
 # Auto-login users.
 # shellcheck disable=2016
-patch_append auto-login resources/app/public/scripts/foundry.mjs << END
+patch_append auto-login $FOUNDRY_FILE << END
 	window.withHeaderInfo((headerInfo) => {
 		// Check to see if the main form/placeholder exists, if it does not we're not on the right page and can just abort.
 		if (!document.querySelector('#join-game')) {
