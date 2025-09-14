@@ -8,9 +8,9 @@ ROLE_ADMIN="${ROLE_ADMIN:-"foundry-admin"}"
 MAJOR_VERSION=$( echo ${FOUNDRY_VERSION} | cut -d'.' -f1)
 
 if [[ $MAJOR_VERSION > 12 ]]; then
-	$FOUNDRY_FILE='resources/app/public/scripts/foundry.mjs'
+	FOUNDRY_FILE='resources/app/public/scripts/foundry.mjs'
 else
-	$FOUNDRY_FILE='resources/app/public/scripts/foundry.js'
+	FOUNDRY_FILE='resources/app/public/scripts/foundry.js'
 fi
 
 # usage: $0 patch-name file [sed-expression]
