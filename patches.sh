@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-HEADER_USERNAME="${HEADER_USERNAME:-"x-auth-request-preferred-username"}"
-HEADER_ROLES="${HEADER_ROLES:-"x-auth-request-groups"}"
-ROLE_PLAYER="${ROLE_PLAYER:-"role:foundry-vtt:player"}"
-ROLE_ADMIN="${ROLE_ADMIN:-"role:foundry-vtt:admin"}"
+HEADER_USERNAME="${HEADER_USERNAME:-"x-authentik-username"}"
+HEADER_ROLES="${HEADER_ROLES:-"x-authentik-groups"}"
+HEADER_ROLES_SEPARATOR="${HEADER_ROLES_SEPARATOR:-"|"}"
+ROLE_PLAYER="${ROLE_PLAYER:-"foundry-player"}"
+ROLE_ADMIN="${ROLE_ADMIN:-"foundry-admin"}"
 
 # usage: $0 patch-name file [sed-expression]
 # Utility to use sed to patch a file, verifying that it actually changed something.
@@ -48,7 +49,7 @@ patch_append() (
 patch_sed admin-header-login resources/app/dist/sessions.mjs "s/testPassword(\(\w\+\)\.body\.adminPassword,\w\+,getSalt(config.passwordSalt))/(s.headers['$HEADER_ROLES'].split(',').includes('$ROLE_ADMIN'))/"
 
 # Replace user password check with header check. In addition to the player themselves admins will also be allowed to log in as any player.
-patch_sed user-header-login resources/app/dist/sessions.mjs "s/testPassword(\w\+,\(\w\+\)\.password,\w\+.passwordSalt)/((s.headers['$HEADER_USERNAME'].toLowerCase() === \1.name.toLowerCase() \&\& s.headers['$HEADER_ROLES'].split(',').includes('$ROLE_PLAYER')) || s.headers['$HEADER_ROLES'].split(',').includes('$ROLE_ADMIN'))/"
+patch_sed user-header-login resources/app/dist/sessions.mjs "s/testPassword(\w\+,\(\w\+\)\.password,\w\+.passwordSalt)/((s.headers['$HEADER_USERNAME'].toLowerCase() === \1.name.toLowerCase() \&\& s.headers['$HEADER_ROLES'].split('$HEADER_ROLES_SEPARATOR').includes('$ROLE_PLAYER')) || s.headers['$HEADER_ROLES'].split('$HEADER_ROLES_SEPARATOR').includes('$ROLE_ADMIN'))/"
 
 # Hide password fields.
 patch_append hide-password-fields resources/app/public/css/foundry2.css << END
