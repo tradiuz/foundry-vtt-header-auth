@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 HEADER_USERNAME="${HEADER_USERNAME:-"x-authentik-username"}"
-HEADER_ROLES="${HEADER_ROLES:-"x-authentik-groups"}"
+HEADER_ROLES="${HEADER_ROLES:-"x-authentik-entitlements"}"
 HEADER_ROLES_SEPARATOR="${HEADER_ROLES_SEPARATOR:-"|"}"
 ROLE_PLAYER="${ROLE_PLAYER:-"foundry-player"}"
 ROLE_ADMIN="${ROLE_ADMIN:-"foundry-admin"}"
